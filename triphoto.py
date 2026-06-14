@@ -13,7 +13,6 @@ import rawpy
 import numpy as np
 
 ### TriPhoto
-print("a")
 #-------------------------------------------------------------
 # Affichage image
 #-------------------------------------------------------------
@@ -48,7 +47,7 @@ class TriPhoto(ctk.CTk):
         self.dossier_source: Path|None = None
         self.dossier_destination: Path | None = None
         self.listage: int = 0
-        self.photos:   list[Path] = []
+        self.photos:   list[Path] = ["C:/Users/thaoh/Pictures/Iris/Boom 31-01-2025P1250899.RW2"]
         self.history:  list[tuple[Path, str | None]] = []
 
         self._tk_img   = None   # éviter le GC
@@ -58,20 +57,30 @@ class TriPhoto(ctk.CTk):
         # Methodes
         self._build_UI()
 
-        self._bind_keys()
+        self._bind_keys() #ok
 
+    
+    
     #definition des methodes
     #methode pour construire l'interface utilisateur
     def _build_UI(self):
         self.grid_rowconfigure(0, weight=1)
         self.grid_columnconfigure(1, weight=1)
-            
+        
+    # visuel
         self._visionneur()
-        self._barre_outils()
-        self._barre_raccourcis()
+        self._barre_outils() #ok
+        self._barre_raccourcis() #presque je narrive pas a le faire coller a la barre d'outils
+
+    #donnée
+        
         
     def _visionneur(self):
-        return
+        self.frame_visionneur = ctk.CTkFrame(self)
+        self.frame_visionneur.grid(row=0, column=2, padx=10, sticky="nws")
+        self.Image_label = ctk.CTkLabel(self.frame_visionneur, image=Affiche_photo(self.photos[0], 400,400), text="")
+        self.Image_label.grid(row=0, column = 0, padx=10, pady=(10, 0), sticky="w")
+        
             
 
 
@@ -80,18 +89,18 @@ class TriPhoto(ctk.CTk):
         self.frame_outil = ctk.CTkFrame(self,  corner_radius=0, width=270)
         self.frame_outil.grid(row=0, column=0, sticky="new")
            
-        self.frame_outil_title = ctk.CTkLabel(self.frame_outil, text="Barre d'outils", font=ctk.CTkFont(size=20, weight="bold"))
-        self.frame_outil_title.grid(row=0, column=0, padx=10, pady=(10, 0), sticky="w")
+        self.label_outil = ctk.CTkLabel(self.frame_outil, text="Barre d'outils", font=ctk.CTkFont(size=20, weight="bold"))
+        self.label_outil.grid(row=0, column=0, padx=10, pady=(10, 0), sticky="w")
         
-        self.bouton_dossier_source = ctk.CTkButton(self.frame_outil, text="Choisir dossier source", command=self._choisir_dossier_source)
+        self.bouton_dossier_source = ctk.CTkButton(self.frame_outil, text="Choisir dossier source", command=lambda: self._choisir_dossier_source())
         self.bouton_dossier_source.grid(row=1, column=0, padx=10, pady=(10, 0), sticky="w")
 
-        self.bouton_dossier_destination = ctk.CTkButton(self.frame_outil, text="Choisir dossier destination", command=self._choisir_dossier_destination)
+        self.bouton_dossier_destination = ctk.CTkButton(self.frame_outil, text="Choisir dossier destination", command=lambda: self._choisir_dossier_destination())
         self.bouton_dossier_destination.grid(row=1, column=1, padx=10, pady=(10, 0), sticky="w")
 
     def _barre_raccourcis(self):
         self.frame_raccourcis = ctk.CTkFrame(self, corner_radius=0)
-        self.frame_raccourcis.grid(row=1, column=0, columnspan=2, padx=10, pady=(10, 0), sticky="nw")
+        self.frame_raccourcis.grid(row=1, column=0, columnspan=2, padx=0, pady=(0, 0), sticky="nw")
 
         self.label_raccourcis = ctk.CTkLabel(self.frame_raccourcis, text="Raccourcis clavier:", font=ctk.CTkFont(size=15, weight="bold"))
         self.label_raccourcis.grid(row=0, column=0, padx=10, pady=(10, 0), sticky="nw")
@@ -121,11 +130,24 @@ class TriPhoto(ctk.CTk):
 
     #------Méthode pour choisir les dossiers source et destination
     def _choisir_dossier_source(self):
-        return
-    
+        self.dossier_source = filedialog.askdirectory(title="Choisi ton dossier source")
+        print("Selected Folder:", self.dossier_source)
+        self._lister_photo()
+
     #------Méthode pour choisir le dossier destination
     def _choisir_dossier_destination(self):
-        return
+        self.dossier_destination = filedialog.askdirectory(title="choisi ton dossier destination")
+        print("Selected Folder:", self.dossier_destination)
 
+
+    def _lister_photo(self):
+        print(self.dossier_source)
+        for i in os.listdir(self.dossier_source):
+            if i.endswith(".RW2")  | i.endswith(".jpeg") | i.endswith(".jpg")  | i.endswith(".png") :
+                self.photos.append(self.dossier_source + i)
+        return
+    
+
+    
 app = TriPhoto()
-app.mainloop()  
+app.mainloop()
